@@ -1,0 +1,10 @@
+{
+  "name": "parseVideo",
+  "version": "1.0.0",
+  "description": "短视频链接解析云函数（抖音/快手/小红书/B站）",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^1.6.8"
+  }
+}

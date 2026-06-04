@@ -1,0 +1,94 @@
+<view class="page">
+  <!-- 顶部标题 -->
+  <view class="header">
+    <view class="title">视频提取</view>
+    <view class="subtitle">粘贴分享链接，一键提取无水印视频</view>
+  </view>
+
+  <!-- 输入区 -->
+  <view class="input-card">
+    <textarea
+      class="input"
+      placeholder="粘贴抖音 / 快手 / 小红书 / B站 的分享链接或文案"
+      placeholder-class="input-ph"
+      value="{{inputText}}"
+      bindinput="onInput"
+      maxlength="2000"
+      auto-height
+    />
+    <view class="input-actions">
+      <view class="link-btn" bindtap="onPaste">📋 粘贴</view>
+      <view class="link-btn" wx:if="{{inputText}}" bindtap="onClear">清空</view>
+    </view>
+  </view>
+
+  <!-- 提取按钮 -->
+  <button class="extract-btn {{loading ? 'disabled' : ''}}" bindtap="onExtract" disabled="{{loading}}">
+    <text wx:if="{{loading}}">解析中...</text>
+    <text wx:else>开始提取</text>
+  </button>
+
+  <!-- 平台标签 -->
+  <view class="platforms">
+    <text class="tag">抖音</text>
+    <text class="tag">快手</text>
+    <text class="tag">小红书</text>
+    <text class="tag">B站</text>
+  </view>
+
+  <!-- 结果区 -->
+  <view class="result" wx:if="{{result}}">
+    <view class="result-head">
+      <text class="result-platform">{{result.platform}}</text>
+      <text class="result-type">{{result.type === 'image' ? '图文' : '视频'}}</text>
+    </view>
+    <view class="result-title" wx:if="{{result.title}}">{{result.title}}</view>
+    <view class="result-author" wx:if="{{result.author}}">作者：{{result.author}}</view>
+
+    <!-- 视频预览 -->
+    <video
+      wx:if="{{result.type !== 'image' && result.videoUrl}}"
+      class="video"
+      src="{{result.videoUrl}}"
+      poster="{{result.cover}}"
+      controls
+      show-center-play-btn
+      object-fit="contain"
+    />
+
+    <!-- 图文预览 -->
+    <scroll-view wx:if="{{result.type === 'image'}}" class="image-list" scroll-x>
+      <image
+        wx:for="{{result.images}}"
+        wx:key="index"
+        class="image-item"
+        src="{{item}}"
+        mode="aspectFill"
+        bindtap="onPreviewImage"
+        data-index="{{index}}"
+      />
+    </scroll-view>
+
+    <view class="note" wx:if="{{result.note}}">⚠️ {{result.note}}</view>
+
+    <!-- 操作按钮 -->
+    <view class="actions">
+      <button class="action-btn primary" wx:if="{{result.type !== 'image'}}" bindtap="onSaveVideo">
+        保存视频到相册
+      </button>
+      <button class="action-btn primary" wx:if="{{result.type === 'image'}}" bindtap="onSaveImages">
+        保存全部图片
+      </button>
+      <button class="action-btn ghost" bindtap="onCopyUrl">复制直链</button>
+    </view>
+  </view>
+
+  <!-- 使用说明 -->
+  <view class="tips">
+    <view class="tips-title">使用说明</view>
+    <view class="tips-item">1. 在抖音/快手等 App 里点击「分享 → 复制链接」</view>
+    <view class="tips-item">2. 回到本小程序，点「粘贴」并「开始提取」</view>
+    <view class="tips-item">3. 提取成功后可在线预览并保存到相册</view>
+    <view class="tips-item disclaimer">仅供个人学习与备份，请勿用于商业用途或侵权传播。</view>
+  </view>
+</view>

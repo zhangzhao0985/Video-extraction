@@ -1,0 +1,20 @@
+{
+  "miniprogramRoot": "miniprogram/",
+  "cloudfunctionRoot": "cloudfunctions/",
+  "compileType": "miniprogram",
+  "appid": "请替换为你自己的小程序-AppID",
+  "projectname": "video-extraction",
+  "description": "视频提取小程序（抖音/快手/小红书/B站）",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "nodeModules": true,
+    "uploadWithSourceMap": true
+  },
+  "libVersion": "latest",
+  "condition": {}
+}

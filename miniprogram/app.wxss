@@ -1,0 +1,18 @@
+/* 全局样式 */
+page {
+  --bg: #0f1115;
+  --card: #1a1d24;
+  --card-2: #232732;
+  --text: #f5f6f8;
+  --text-2: #9aa0ac;
+  --primary: #4f8cff;
+  --primary-2: #6aa1ff;
+  --danger: #ff5d5d;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", Helvetica, sans-serif;
+}
+
+view, text, button, input, textarea {
+  box-sizing: border-box;
+}
