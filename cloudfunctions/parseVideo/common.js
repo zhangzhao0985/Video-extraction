@@ -19,12 +19,12 @@ const TIMEOUT = 12000
 /**
  * 发起 GET 请求，自动跟随重定向
  * @param {string} url
- * @param {object} options { ua, headers, responseType }
+ * @param {object} options { ua, headers, responseType, timeout }
  */
 async function httpGet(url, options = {}) {
-  const { ua = UA.mobile, headers = {}, responseType = 'text' } = options
+  const { ua = UA.mobile, headers = {}, responseType = 'text', timeout = TIMEOUT } = options
   const res = await axios.get(url, {
-    timeout: TIMEOUT,
+    timeout,
     responseType,
     maxRedirects: 5,
     headers: {
