@@ -1,0 +1,10 @@
+{
+  "name": "transferMedia",
+  "version": "1.0.0",
+  "description": "把远程视频/图片下载并转存到云存储，绕过 downloadFile 合法域名限制",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3",
+    "axios": "^1.6.8"
+  }
+}
