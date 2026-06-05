@@ -1,4 +1,5 @@
 // 首页：粘贴链接 -> 调用云函数解析 -> 预览/保存
+const config = require('../../config')
 const { downloadAndSaveVideo, downloadAndSaveImages } = require('../../utils/util')
 
 Page({
@@ -6,6 +7,59 @@ Page({
     inputText: '',
     loading: false,
     result: null,
+    // 广告
+    showBanner: false,
+    bannerAdUnitId: '',
+  },
+
+  onLoad() {
+    // Banner 横幅：仅在已正确配置广告位时显示
+    if (config.isConfigured(config.bannerAdUnitId)) {
+      this.setData({ showBanner: true, bannerAdUnitId: config.bannerAdUnitId })
+    }
+    // 预创建激励视频广告
+    this.initRewardedAd()
+  },
+
+  // 初始化激励视频广告（仅在已配置时创建）
+  initRewardedAd() {
+    this.rewardedAd = null
+    this.pendingRewardAction = null
+    if (!wx.createRewardedVideoAd || !config.isConfigured(config.rewardedVideoAdUnitId)) {
+      return
+    }
+    const ad = wx.createRewardedVideoAd({ adUnitId: config.rewardedVideoAdUnitId })
+    ad.onError((err) => console.error('激励视频广告出错:', err))
+    ad.onClose((res) => {
+      const action = this.pendingRewardAction
+      this.pendingRewardAction = null
+      if (res && res.isEnded) {
+        if (action) action() // 看完整广告 -> 执行保存
+      } else {
+        wx.showToast({ title: '看完广告才能保存哦', icon: 'none' })
+      }
+    })
+    this.rewardedAd = ad
+  },
+
+  // 先看激励视频再执行 action；未配置或广告加载失败时直接放行
+  runWithRewardedAd(action) {
+    const ad = this.rewardedAd
+    if (!ad) {
+      action()
+      return
+    }
+    this.pendingRewardAction = action
+    ad.show().catch(() => {
+      ad
+        .load()
+        .then(() => ad.show())
+        .catch(() => {
+          // 广告基建失败不该惩罚用户，直接放行
+          this.pendingRewardAction = null
+          action()
+        })
+    })
   },
 
   onInput(e) {
@@ -69,11 +123,15 @@ Page({
     }
   },
 
-  // 保存视频到相册
-  async onSaveVideo() {
-    const url = this.data.result && this.data.result.videoUrl
-    if (!url) return
-    wx.showLoading({ title: '下载中...', mask: true })
+  // 保存视频到相册（先看激励视频）
+  onSaveVideo() {
+    if (!(this.data.result && this.data.result.videoUrl)) return
+    this.runWithRewardedAd(() => this.doSaveVideo())
+  },
+
+  async doSaveVideo() {
+    const url = this.data.result.videoUrl
+    wx.showLoading({ title: '保存中...', mask: true })
     try {
       await downloadAndSaveVideo(url)
       wx.hideLoading()
@@ -84,10 +142,15 @@ Page({
     }
   },
 
-  // 保存全部图片
-  async onSaveImages() {
+  // 保存全部图片（先看激励视频）
+  onSaveImages() {
     const images = (this.data.result && this.data.result.images) || []
     if (!images.length) return
+    this.runWithRewardedAd(() => this.doSaveImages())
+  },
+
+  async doSaveImages() {
+    const images = this.data.result.images
     wx.showLoading({ title: '保存图片中...', mask: true })
     try {
       await downloadAndSaveImages(images)
@@ -116,6 +179,12 @@ Page({
       data: url,
       success: () => wx.showToast({ title: '直链已复制', icon: 'none' }),
     })
+  },
+
+  // Banner 广告加载失败则隐藏
+  onBannerError(e) {
+    console.error('Banner 广告出错:', e && e.detail)
+    this.setData({ showBanner: false })
   },
 
   // 统一处理保存失败（多为相册权限被拒）

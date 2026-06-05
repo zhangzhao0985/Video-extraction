@@ -186,3 +186,8 @@
   margin-top: 16rpx;
   color: #6b7280;
 }
+
+/* 底部 Banner 广告 */
+.banner-wrap {
+  margin-top: 40rpx;
+}

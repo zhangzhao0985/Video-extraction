@@ -91,4 +91,9 @@
     <view class="tips-item">3. 提取成功后可在线预览并保存到相册</view>
     <view class="tips-item disclaimer">仅供个人学习与备份，请勿用于商业用途或侵权传播。</view>
   </view>
+
+  <!-- 底部 Banner 广告（配置了广告位才显示） -->
+  <view class="banner-wrap" wx:if="{{showBanner}}">
+    <ad unit-id="{{bannerAdUnitId}}" binderror="onBannerError"></ad>
+  </view>
 </view>
