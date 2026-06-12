@@ -1,12 +1,15 @@
 // 首页：粘贴链接 -> 调用云函数解析 -> 预览/保存
 const config = require('../../config')
-const { downloadAndSaveVideo, downloadAndSaveImages } = require('../../utils/util')
+const { downloadAndSaveVideo, downloadAndSaveImages, transferToCloud } = require('../../utils/util')
 
 Page({
   data: {
     inputText: '',
     loading: false,
     result: null,
+    // 图文展示：经云存储中转的临时链接，绕过小红书图片防盗链
+    displayImages: [],
+    imagesLoading: false,
     // 广告
     showBanner: false,
     bannerAdUnitId: '',
@@ -67,7 +70,7 @@ Page({
   },
 
   onClear() {
-    this.setData({ inputText: '', result: null })
+    this.setData({ inputText: '', result: null, displayImages: [], imagesLoading: false })
   },
 
   // 读取剪贴板
@@ -102,7 +105,9 @@ Page({
       })
       const { success, data, message } = res.result || {}
       if (success && data) {
-        this.setData({ result: data })
+        const isImg = data.type === 'image' && data.images && data.images.length
+        this.setData({ result: data, displayImages: [], imagesLoading: !!isImg })
+        if (isImg) this.prepareImageDisplay(data.images)
       } else {
         wx.showModal({
           title: '解析失败',
@@ -120,6 +125,30 @@ Page({
     } finally {
       wx.hideLoading()
       this.setData({ loading: false })
+    }
+  },
+
+  // 图文图片经云存储中转，拿到无防盗链的临时链接用于显示
+  async prepareImageDisplay(images) {
+    try {
+      const fileIDs = await Promise.all(
+        images.map((u) => transferToCloud(u, 'image').catch(() => null))
+      )
+      const valid = fileIDs.filter(Boolean)
+      let display = images
+      if (valid.length) {
+        const { fileList } = await wx.cloud.getTempFileURL({ fileList: valid })
+        const map = {}
+        fileList.forEach((f) => {
+          if (f.tempFileURL) map[f.fileID] = f.tempFileURL
+        })
+        display = fileIDs.map((id, i) => (id && map[id]) || images[i])
+      }
+      this.setData({ displayImages: display, imagesLoading: false })
+    } catch (e) {
+      console.error('图片展示转存失败:', e)
+      // 退化：用原始链接（真机可能仍黑屏，但点开可预览）
+      this.setData({ displayImages: images, imagesLoading: false })
     }
   },
 
@@ -162,10 +191,13 @@ Page({
     }
   },
 
-  // 预览图片
+  // 预览图片（优先用中转后的链接，保证大图也能正常显示）
   onPreviewImage(e) {
     const index = e.currentTarget.dataset.index
-    const urls = (this.data.result && this.data.result.images) || []
+    const urls =
+      (this.data.displayImages && this.data.displayImages.length
+        ? this.data.displayImages
+        : this.data.result && this.data.result.images) || []
     wx.previewImage({ current: urls[index], urls })
   },
 

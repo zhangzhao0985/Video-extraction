@@ -56,10 +56,11 @@
       object-fit="contain"
     />
 
-    <!-- 图文预览 -->
-    <scroll-view wx:if="{{result.type === 'image'}}" class="image-list" scroll-x>
+    <!-- 图文预览（图片经云存储中转显示，避免防盗链黑屏） -->
+    <view wx:if="{{result.type === 'image' && imagesLoading}}" class="img-loading">图片加载中...</view>
+    <scroll-view wx:elif="{{result.type === 'image'}}" class="image-list" scroll-x>
       <image
-        wx:for="{{result.images}}"
+        wx:for="{{displayImages}}"
         wx:key="index"
         class="image-item"
         src="{{item}}"
