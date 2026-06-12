@@ -187,10 +187,11 @@ Page({
     this.setData({ showBanner: false })
   },
 
-  // 统一处理保存失败（多为相册权限被拒）
+  // 统一处理保存失败（区分相册权限 / 其他错误，并显示真实原因）
   handleSaveError(err) {
     console.error(err)
-    if (err && /auth|permission|deny/i.test(JSON.stringify(err))) {
+    const msg = (err && (err.errMsg || err.message)) || ''
+    if (/auth|permission|deny/i.test(JSON.stringify(err)) || /auth|permission|deny/i.test(msg)) {
       wx.showModal({
         title: '需要相册权限',
         content: '请在设置中允许保存到相册后重试',
@@ -200,7 +201,12 @@ Page({
         },
       })
     } else {
-      wx.showToast({ title: '保存失败，请重试', icon: 'none' })
+      // 显示真实错误，便于定位（如云端转存失败/下载失败的具体原因）
+      wx.showModal({
+        title: '保存失败',
+        content: msg || '请重试',
+        showCancel: false,
+      })
     }
   },
 })
