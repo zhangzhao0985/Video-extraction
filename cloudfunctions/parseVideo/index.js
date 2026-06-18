@@ -19,6 +19,8 @@ async function isTextSafe(content, openid) {
       scene: 1, // 1=资料
       openid,
     })
+    // 打印接口返回值，便于在云函数日志中录屏取证（审核要求）
+    console.log('msgSecCheck 调用成功，返回:', JSON.stringify(res))
     // V2 返回 result.suggest: pass / review / risky
     if (res && res.result && res.result.suggest && res.result.suggest !== 'pass') {
       return false
