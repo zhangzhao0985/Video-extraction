@@ -34,6 +34,7 @@
     <text class="tag">快手</text>
     <text class="tag">小红书</text>
     <text class="tag">B站</text>
+    <button class="share-tag" open-type="share">分享给好友</button>
   </view>
 
   <!-- 结果区 -->

@@ -79,6 +79,18 @@
   padding: 8rpx 24rpx;
   border-radius: 24rpx;
 }
+.share-tag {
+  font-size: 24rpx;
+  color: var(--primary-2);
+  background: var(--card-2);
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  line-height: 1.6;
+  margin: 0;
+}
+.share-tag::after {
+  border: none;
+}
 
 /* 结果区 */
 .result {

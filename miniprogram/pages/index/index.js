@@ -24,6 +24,21 @@ Page({
     this.initRewardedAd()
   },
 
+  // 转发给朋友 / 群（实现此函数后「···」菜单的转发才可用）
+  onShareAppMessage() {
+    const r = this.data.result
+    return {
+      title: r && r.title ? `【${r.platform}】${r.title}` : '视频提取 · 一键提取无水印视频/图片',
+      path: '/pages/index/index',
+      imageUrl: (r && r.cover) || '',
+    }
+  },
+
+  // 分享到朋友圈
+  onShareTimeline() {
+    return { title: '视频提取 · 一键提取无水印视频/图片' }
+  },
+
   // 初始化激励视频广告（仅在已配置时创建）
   initRewardedAd() {
     this.rewardedAd = null
