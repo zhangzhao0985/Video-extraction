@@ -79,6 +79,18 @@
   padding: 8rpx 24rpx;
   border-radius: 24rpx;
 }
+.share-tag {
+  font-size: 24rpx;
+  color: var(--primary-2);
+  background: var(--card-2);
+  padding: 8rpx 24rpx;
+  border-radius: 24rpx;
+  line-height: 1.6;
+  margin: 0;
+}
+.share-tag::after {
+  border: none;
+}
 
 /* 结果区 */
 .result {
@@ -123,6 +135,14 @@
 }
 
 /* 图文 */
+.img-loading {
+  margin-top: 24rpx;
+  height: 200rpx;
+  line-height: 200rpx;
+  text-align: center;
+  color: var(--text-2);
+  font-size: 26rpx;
+}
 .image-list {
   white-space: nowrap;
   margin-top: 24rpx;
@@ -185,4 +205,9 @@
 .tips-item.disclaimer {
   margin-top: 16rpx;
   color: #6b7280;
+}
+
+/* 底部 Banner 广告 */
+.banner-wrap {
+  margin-top: 40rpx;
 }

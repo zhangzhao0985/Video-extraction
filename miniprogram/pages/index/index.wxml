@@ -34,6 +34,7 @@
     <text class="tag">快手</text>
     <text class="tag">小红书</text>
     <text class="tag">B站</text>
+    <button class="share-tag" open-type="share">分享给好友</button>
   </view>
 
   <!-- 结果区 -->
@@ -56,10 +57,11 @@
       object-fit="contain"
     />
 
-    <!-- 图文预览 -->
-    <scroll-view wx:if="{{result.type === 'image'}}" class="image-list" scroll-x>
+    <!-- 图文预览（图片经云存储中转显示，避免防盗链黑屏） -->
+    <view wx:if="{{result.type === 'image' && imagesLoading}}" class="img-loading">图片加载中...</view>
+    <scroll-view wx:elif="{{result.type === 'image'}}" class="image-list" scroll-x>
       <image
-        wx:for="{{result.images}}"
+        wx:for="{{displayImages}}"
         wx:key="index"
         class="image-item"
         src="{{item}}"
@@ -90,5 +92,10 @@
     <view class="tips-item">2. 回到本小程序，点「粘贴」并「开始提取」</view>
     <view class="tips-item">3. 提取成功后可在线预览并保存到相册</view>
     <view class="tips-item disclaimer">仅供个人学习与备份，请勿用于商业用途或侵权传播。</view>
+  </view>
+
+  <!-- 底部 Banner 广告（配置了广告位才显示） -->
+  <view class="banner-wrap" wx:if="{{showBanner}}">
+    <ad unit-id="{{bannerAdUnitId}}" binderror="onBannerError"></ad>
   </view>
 </view>
