@@ -53,6 +53,16 @@ exports.main = async (event = {}) => {
     const cloudPath = `extract/${Date.now()}-${Math.floor(Math.random() * 1e6)}.${ext}`
     const up = await cloud.uploadFile({ cloudPath, fileContent: buf })
 
+    // 记录到 media_temp 集合，供定时清理函数按时间删除（失败不影响转存）
+    try {
+      await cloud
+        .database()
+        .collection('media_temp')
+        .add({ data: { fileID: up.fileID, createTime: Date.now() } })
+    } catch (e) {
+      console.error('记录 media_temp 失败（不影响转存）:', e && e.message)
+    }
+
     return { success: true, fileID: up.fileID, size: buf.length }
   } catch (e) {
     console.error('transferMedia error:', e)
