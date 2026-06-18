@@ -16,6 +16,8 @@ Page({
   },
 
   onLoad() {
+    // 显式开启转发 / 朋友圈分享菜单
+    wx.showShareMenu({ withShareTicket: true, menus: ['shareAppMessage', 'shareTimeline'] })
     // Banner 横幅：仅在已正确配置广告位时显示
     if (config.isConfigured(config.bannerAdUnitId)) {
       this.setData({ showBanner: true, bannerAdUnitId: config.bannerAdUnitId })
